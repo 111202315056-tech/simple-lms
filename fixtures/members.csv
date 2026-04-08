@@ -1,0 +1,11 @@
+course_name,username,roles
+Pemrograman Web,siswa01,std
+Pemrograman Web,siswa02,std
+Pemrograman Web,siswa03,ast
+Basis Data,siswa01,std
+Basis Data,siswa02,std
+Algoritma,siswa03,std
+Algoritma,siswa04,std
+Jaringan Komputer,siswa01,std
+Jaringan Komputer,siswa04,ast
+Machine Learning,siswa02,std
