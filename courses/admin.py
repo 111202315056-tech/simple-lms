@@ -1,55 +1,38 @@
 from django.contrib import admin
-from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
-from .models import User, Category, Course, Lesson, Enrollment, Progress
-
-
-@admin.register(User)
-class UserAdmin(BaseUserAdmin):
-    list_display = ('username', 'email', 'role', 'is_staff')
-    list_filter = ('role', 'is_staff')
-    fieldsets = BaseUserAdmin.fieldsets + (
-        ('Role', {'fields': ('role',)}),
-    )
-
-
-@admin.register(Category)
-class CategoryAdmin(admin.ModelAdmin):
-    list_display = ('name', 'parent')
-    search_fields = ('name',)
-
-
-class LessonInline(admin.TabularInline):
-    model = Lesson
-    extra = 1
-    fields = ('order', 'title', 'video_url')
-    ordering = ('order',)
+from .models import Course, CourseMember, CourseContent, Comment, Assignment
 
 
 @admin.register(Course)
 class CourseAdmin(admin.ModelAdmin):
-    list_display = ('title', 'instructor', 'category', 'is_published', 'created_at')
-    list_filter = ('is_published', 'category', 'instructor')
-    search_fields = ('title', 'description')
+    list_display = ('name', 'teacher', 'price', 'created_at')
+    list_filter = ('teacher', 'created_at')
+    search_fields = ('name', 'description')
     ordering = ('-created_at',)
-    inlines = [LessonInline]
 
 
-@admin.register(Lesson)
-class LessonAdmin(admin.ModelAdmin):
-    list_display = ('title', 'course', 'order')
-    list_filter = ('course',)
-    search_fields = ('title',)
-    ordering = ('course', 'order')
+@admin.register(CourseMember)
+class CourseMemberAdmin(admin.ModelAdmin):
+    list_display = ('course_id', 'user_id', 'roles')
+    list_filter = ('roles',)
+    search_fields = ('user_id__username', 'course_id__name')
 
 
-@admin.register(Enrollment)
-class EnrollmentAdmin(admin.ModelAdmin):
-    list_display = ('student', 'course', 'enrolled_at')
-    list_filter = ('course',)
-    search_fields = ('student__username', 'course__title')
+@admin.register(CourseContent)
+class CourseContentAdmin(admin.ModelAdmin):
+    list_display = ('name', 'course_id', 'parent_id')
+    list_filter = ('course_id',)
+    search_fields = ('name', 'description')
 
 
-@admin.register(Progress)
-class ProgressAdmin(admin.ModelAdmin):
-    list_display = ('enrollment', 'lesson', 'is_completed', 'completed_at')
-    list_filter = ('is_completed',)
+@admin.register(Comment)
+class CommentAdmin(admin.ModelAdmin):
+    list_display = ('content_id', 'member_id', 'comment')
+    list_filter = ('content_id',)
+    search_fields = ('comment',)
+
+
+@admin.register(Assignment)
+class AssignmentAdmin(admin.ModelAdmin):
+    list_display = ('title', 'course_id', 'created_by', 'due_date')
+    list_filter = ('course_id',)
+    search_fields = ('title', 'description')

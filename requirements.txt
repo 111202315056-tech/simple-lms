@@ -1,4 +1,8 @@
-Django
+Django==5.2.13
 psycopg2-binary
-python-dotenv
 Pillow
+django-silk
+django-ninja
+python-dotenv
+PyJWT
+bcrypt
