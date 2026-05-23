@@ -48,17 +48,30 @@ DB_HOST=postgres_db
 DB_PORT=5432
  🐳 Docker Services
 
-Project ini menggunakan 2 service utama:
+Project ini menggunakan beberapa service utama:
 
 1. Web (Django)
 
 * Menjalankan aplikasi Django
 * Port: `8000`
 
-### 2. Database (PostgreSQL)
+2. Database (PostgreSQL)
 
 * Menyimpan data aplikasi
 * Menggunakan volume agar data persistent
+
+3. Redis
+
+* Menyediakan cache untuk daftar course dan detail course
+* Dipakai juga sebagai backend Celery result
+
+4. RabbitMQ
+
+* Message broker untuk Celery task queue
+
+5. MongoDB
+
+* Menyimpan log aktivitas dan analytics
 
 
  🚀 Cara Menjalankan Project
@@ -79,8 +92,7 @@ cp .env.example .env
 
 docker-compose up --build
 
-
-4. Jalankan Migration
+ 4. Jalankan Migration
 
 Buka terminal baru:
 
@@ -91,6 +103,61 @@ docker-compose run web python manage.py migrate
  5. Buat Superuser
 
 docker-compose run web python manage.py createsuperuser
+
+ 6. Jalankan Celery Worker & Scheduler
+
+docker-compose up -d celery-worker celery-beat flower
+
+### Celery Task Queue
+
+Service Celery digunakan untuk memproses task asynchronous di background. Di project ini:
+
+- `celery-worker` menjalankan worker yang mengambil task dari RabbitMQ
+- `celery-beat` menjalankan scheduler untuk task berkala
+- `flower` menyediakan dashboard monitoring task
+
+#### Jalankan Celery secara manual
+
+```bash
+docker compose run web celery -A config worker --loglevel=info
+```
+
+```bash
+docker compose run web celery -A config beat --loglevel=info
+```
+
+#### Jalankan dengan Docker Compose
+
+```bash
+docker compose up -d celery-worker celery-beat flower
+```
+
+#### Monitor Task dengan Flower
+
+Buka:
+
+http://localhost:5555
+
+Di Flower kamu bisa melihat:
+
+- status worker
+- antrean task
+- hasil task
+- task yang gagal
+
+### API Task Examples
+
+- Submit request sertifikat: `POST /api/v1/courses/{id}/request-certificate/`
+- Export laporan course: `POST /api/v1/courses/{id}/export-report/`
+- Jadwalkan ulang statistik: `POST /api/v1/analytics/schedule-statistics/`
+- Cek status task: `GET /api/v1/tasks/{task_id}/`
+
+### Troubleshooting
+
+- Pastikan `rabbitmq` dan `redis` sudah aktif sebelum memulai worker
+- Jalankan `docker compose logs celery-worker` untuk melihat error worker
+- Jika task tidak selesai, cek `flower` atau log `celery-beat`
+
 🌐 Akses Aplikasi
 
 * Homepage Django:
@@ -117,6 +184,12 @@ docker-compose run web python manage.py createsuperuser
 * PostgreSQL terintegrasi
 * Migration database berhasil
 * Admin panel aktif
+* Redis caching untuk course list dan detail
+* RabbitMQ & Celery untuk task queue
+* MongoDB untuk activity logs dan analytics
+* Flower untuk monitoring Celery
+* Dokumentasi arsitektur dan Redis CLI tersedia di `docs/`
+* Panduan integrasi asynchronous task tersedia di `docs/module14_async_architecture.md`
 
 🎯 Hasil Pembelajaran
 

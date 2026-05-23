@@ -1,0 +1,65 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+.env/
+.venv/
+venv/
+ENV/
+env/
+
+# Django
+*.log
+*.pot
+*.pyc
+*.pyo
+*.pyd
+*.sqlite3
+/db.sqlite3
+/media/
+
+# Distribution / packaging
+.Python
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# IDEs and editors
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Env files
+.env
+.env.*
+
+# Celery / logs
+celerybeat-schedule
+celerybeat.pid
+
+# Coverage / test results
+.coverage
+.coverage.*
+.pytest_cache/
+htmlcov/
+
+# Mongo/Python cache
+*.cache
+
+# Docker
+docker-compose.override.yml
+
+# Local settings
+local_settings.py
+
+# Misc
+*.bak
+*.swp
