@@ -10,36 +10,44 @@ services:
       - postgres_data:/var/lib/postgresql/data
     ports:
       - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U lms_user -d lms_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   redis:
     image: redis:7-alpine
     container_name: redis_cache
-    command: redis-server --appendonly yes
     ports:
       - "6379:6379"
     volumes:
       - redis_data:/data
-
-  rabbitmq:
-    image: rabbitmq:3.11-management
-    container_name: rabbitmq
-    ports:
-      - "5672:5672"
-      - "15672:15672"
-    environment:
-      RABBITMQ_DEFAULT_USER: guest
-      RABBITMQ_DEFAULT_PASS: guest
-    volumes:
-      - rabbitmq_data:/var/lib/rabbitmq
+    command: redis-server --appendonly yes
 
   mongodb:
     image: mongo:7
     container_name: mongodb
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: lms_user
+      MONGO_INITDB_ROOT_PASSWORD: lms_pass
+      MONGO_INITDB_DATABASE: lms_logs
     ports:
       - "27017:27017"
     volumes:
       - mongo_data:/data/db
+
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: rabbitmq
     environment:
-      - MONGO_INITDB_DATABASE=simple_lms
+      RABBITMQ_DEFAULT_USER: lms_user
+      RABBITMQ_DEFAULT_PASS: lms_pass
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
 
   web:
     build: .
@@ -47,15 +55,20 @@ services:
     command: python manage.py runserver 0.0.0.0:8000
     volumes:
       - .:/app
+      - media_volume:/app/media
     ports:
       - "8000:8000"
     env_file:
       - .env
     depends_on:
-      - db
-      - redis
-      - rabbitmq
-      - mongodb
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+      mongodb:
+        condition: service_started
+      rabbitmq:
+        condition: service_started
 
   celery-worker:
     build: .
@@ -66,36 +79,40 @@ services:
     env_file:
       - .env
     depends_on:
-      - redis
+      - web
       - rabbitmq
-      - mongodb
+      - redis
 
   celery-beat:
     build: .
     container_name: celery_beat
-    command: celery -A config beat --loglevel=info
+    command: celery -A config beat --loglevel=info --scheduler django_celery_beat.schedulers:DatabaseScheduler
     volumes:
       - .:/app
     env_file:
       - .env
     depends_on:
-      - redis
+      - web
       - rabbitmq
-      - mongodb
+      - redis
 
   flower:
-    image: mher/flower:1.0.1
+    build: .
     container_name: flower
-    command: flower --broker=${CELERY_BROKER_URL}
+    command: celery -A config flower --port=5555 --broker=amqp://lms_user:lms_pass@rabbitmq:5672//
+    volumes:
+      - .:/app
     ports:
       - "5555:5555"
     env_file:
       - .env
     depends_on:
-      - rabbitmq
+      - celery-worker
 
 volumes:
   postgres_data:
   redis_data:
   mongo_data:
   rabbitmq_data:
+  media_volume:
+

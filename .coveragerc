@@ -1,0 +1,15 @@
+[run]
+source = courses, utils
+omit =
+    */migrations/*
+    */tests/*
+    manage.py
+    config/asgi.py
+    config/wsgi.py
+
+[report]
+show_missing = True
+fail_under = 80
+
+[html]
+directory = htmlcov

@@ -80,6 +80,8 @@ class CourseContent(models.Model):
         null=True,
         blank=True
     )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return self.name
@@ -87,6 +89,9 @@ class CourseContent(models.Model):
     class Meta:
         verbose_name = "Konten Kelas"
         verbose_name_plural = "Konten Kelas"
+        indexes = [
+            models.Index(fields=['course_id'], name='idx_content_course'),
+        ]
 
 
 class Comment(models.Model):
@@ -108,6 +113,10 @@ class Comment(models.Model):
     class Meta:
         verbose_name = "Komentar"
         verbose_name_plural = "Komentar"
+        indexes = [
+            models.Index(fields=['content_id'], name='idx_comment_content'),
+            models.Index(fields=['member_id'], name='idx_comment_member'),
+        ]
 
 
 class Assignment(models.Model):

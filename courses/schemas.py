@@ -1,6 +1,6 @@
 from ninja import Schema, Field
 from datetime import datetime
-from typing import Optional, List
+from typing import Optional, List, Any
 
 
 class RegisterIn(Schema):
@@ -54,6 +54,12 @@ class TeacherOut(Schema):
     last_name: str
 
 
+class TeacherV2Out(Schema):
+    id: int
+    username: str
+    full_name: Optional[str] = None
+
+
 class CourseIn(Schema):
     name: str
     description: str = '-'
@@ -71,10 +77,20 @@ class CourseOut(Schema):
     name: str
     description: str
     price: int
-    image: Optional[str] = ''
+    image: Optional[str] = None
     teacher: TeacherOut
     created_at: datetime
     updated_at: datetime
+
+
+class CourseOutV2(Schema):
+    id: int
+    name: str
+    description: str
+    price: int
+    teacher: TeacherV2Out
+    member_count: int
+    created_at: datetime
 
 
 class ContentTitleOut(Schema):
@@ -83,9 +99,7 @@ class ContentTitleOut(Schema):
 
 
 class DetailCourseOut(CourseOut):
-    contents: List[ContentTitleOut] = Field(
-        ..., alias="coursecontent_set"
-    )
+    contents: List[ContentTitleOut] = Field(..., alias='coursecontent_set')
 
 
 class PaginatedCourseOut(Schema):
@@ -103,13 +117,31 @@ class CourseContentIn(Schema):
     parent_id: Optional[int] = None
 
 
+class CourseContentPatchIn(Schema):
+    name: Optional[str] = None
+    description: Optional[str] = None
+    video_url: Optional[str] = None
+    course_id: Optional[int] = None
+    parent_id: Optional[int] = None
+
+
 class CourseContentOut(Schema):
     id: int
     name: str
     description: str
     video_url: Optional[str] = None
+    file_attachment: Optional[str] = None
     course_id: int
     parent_id: Optional[int] = None
+    created_at: datetime
+    updated_at: datetime
+
+
+class PaginatedCourseContentOut(Schema):
+    total: int
+    page: int
+    per_page: int
+    results: List[CourseContentOut]
 
 
 class EnrollmentOut(Schema):
@@ -119,3 +151,26 @@ class EnrollmentOut(Schema):
     course_price: int
     teacher: str
     role: str
+
+
+class CommentIn(Schema):
+    content_id: int
+    comment: str
+
+
+class CommentOut(Schema):
+    id: int
+    comment: str
+    content_id: int
+    member_id: int
+
+
+class PopularCourseOut(Schema):
+    course_id: int
+    name: str
+    score: int
+
+
+class CommentUpdateIn(Schema):
+    comment: str
+
