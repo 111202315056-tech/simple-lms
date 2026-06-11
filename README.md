@@ -248,7 +248,7 @@ docker-compose exec web bash -c "coverage run --source=courses --omit=courses/la
 
 ```bash
 # 1. Clone repository
-git clone [URL_REPOSITORY]
+git clone https://github.com/111202315056-tech/simple-lms
 cd simple-lms
 
 # 2. Salin file environment
