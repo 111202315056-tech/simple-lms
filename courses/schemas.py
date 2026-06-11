@@ -133,8 +133,6 @@ class CourseContentOut(Schema):
     file_attachment: Optional[str] = None
     course_id: int
     parent_id: Optional[int] = None
-    created_at: datetime
-    updated_at: datetime
 
 
 class PaginatedCourseContentOut(Schema):

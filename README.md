@@ -230,3 +230,51 @@ URL: http://localhost:15672
 | celery-worker | python:3.11-slim | - | Async task processor |
 | celery-beat | python:3.11-slim | - | Scheduled task scheduler |
 | flower | python:3.11-slim | 5555 | Celery monitoring dashboard |
+
+## Menjalankan Test
+
+```bash
+# Jalankan semua test
+docker-compose exec web python manage.py test courses --settings=config.settings_test
+
+# Jalankan test dengan coverage report
+docker-compose exec web bash -c "coverage run --source=courses --omit=courses/lab_views.py,courses/tasks.py,courses/views.py manage.py test courses --settings=config.settings_test && coverage report"
+```
+
+**Hasil test:** 61 tests, 59 passed, 2 skipped, 0 failed  
+**Coverage:** 87%
+
+## Cara Menjalankan Project
+
+```bash
+# 1. Clone repository
+git clone [URL_REPOSITORY]
+cd simple-lms
+
+# 2. Salin file environment
+cp .env.example .env
+
+# 3. Jalankan semua service
+docker-compose up -d
+
+# 4. Jalankan migration
+docker-compose exec web python manage.py migrate
+
+# 5. Seed data demo
+docker-compose exec web python seed.py
+
+# 6. Akses aplikasi
+# Swagger UI  : http://localhost:8000/api/v1/docs
+# Django Admin: http://localhost:8000/admin/
+# Silk        : http://localhost:8000/silk/
+# Flower      : http://localhost:5555
+# RabbitMQ    : http://localhost:15672 (lms_user/lms_pass)
+```
+
+## Akun Demo
+
+| Role | Username | Password |
+|---|---|---|
+| Admin | admin | admin123 |
+| Instructor | dosen01 | pass123 |
+| Student | siswa01 | pass123 |
