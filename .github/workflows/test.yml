@@ -1,0 +1,87 @@
+name: Django CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_DB: lms_db
+          POSTGRES_USER: lms_user
+          POSTGRES_PASSWORD: lms_pass
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      SECRET_KEY: ci-test-secret-key-only-for-github-actions-please-change-32
+      DEBUG: "True"
+      DB_NAME: lms_db
+      DB_USER: lms_user
+      DB_PASSWORD: lms_pass
+      DB_HOST: localhost
+      DB_PORT: 5432
+      REDIS_URL: redis://localhost:6379/0
+      CELERY_BROKER_URL: redis://localhost:6379/1
+      CELERY_RESULT_BACKEND: redis://localhost:6379/2
+      MONGO_URI: mongodb://localhost:27017/lms_logs
+      MONGO_DB: lms_logs
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Cache pip dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          pip install coverage
+
+      - name: Run migrations
+        run: python manage.py migrate --settings=config.settings_test
+
+      - name: Run tests with coverage
+        run: |
+          coverage run --source=courses --omit=courses/lab_views.py,courses/tasks.py,courses/views.py manage.py test courses --settings=config.settings_test --noinput
+          coverage report --fail-under=75
+
+      - name: Upload coverage report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: .coverage
