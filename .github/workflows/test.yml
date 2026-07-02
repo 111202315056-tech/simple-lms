@@ -36,7 +36,7 @@ jobs:
           --health-retries 5
 
     env:
-      SECRET_KEY: ci-test-secret-key-only-for-github-actions-please-change-32
+      SECRET_KEY: ci-test-secret-key-only-for-github-actions-32chars
       DEBUG: "True"
       DB_NAME: lms_db
       DB_USER: lms_user
@@ -50,21 +50,12 @@ jobs:
       MONGO_DB: lms_logs
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-
-      - name: Cache pip dependencies
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-pip-
 
       - name: Install dependencies
         run: |
@@ -76,12 +67,5 @@ jobs:
 
       - name: Run tests with coverage
         run: |
-          coverage run --source=courses --omit=courses/lab_views.py,courses/tasks.py,courses/views.py manage.py test courses --settings=config.settings_test --noinput
+          coverage run --source=courses --omit=courses/lab_views.py,courses/tasks.py,courses/views.py manage.py test courses --settings=config.settings_test
           coverage report --fail-under=75
-
-      - name: Upload coverage report
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: coverage-report
-          path: .coverage
