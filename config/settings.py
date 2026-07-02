@@ -5,7 +5,9 @@ from dotenv import load_dotenv
 load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
-SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-ganti-ini-nanti')
+SECRET_KEY = os.getenv('SECRET_KEY')
+if not SECRET_KEY:
+    raise ValueError("SECRET_KEY belum diset. Tambahkan SECRET_KEY di file .env.")
 DEBUG = True
 ALLOWED_HOSTS = ['*']
 
