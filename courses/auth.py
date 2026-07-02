@@ -4,8 +4,9 @@ from datetime import datetime, timedelta, timezone
 from ninja.security import HttpBearer
 from ninja.errors import HttpError
 from django.contrib.auth.models import User
+from django.conf import settings
 
-SECRET_KEY = "simple-lms-secret-key-2025"
+SECRET_KEY = settings.SECRET_KEY
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 REFRESH_TOKEN_EXPIRE_DAYS = 7
