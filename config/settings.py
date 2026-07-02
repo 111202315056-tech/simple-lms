@@ -1,4 +1,5 @@
 import os
+import sys
 from pathlib import Path
 from dotenv import load_dotenv
 load_dotenv()
@@ -96,3 +97,8 @@ STATIC_URL = 'static/'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+# Nonaktifkan rate limiting saat menjalankan test, supaya test suite
+# tidak gagal karena limit request tercapai di endpoint login dsb.
+RATELIMIT_ENABLE = 'test' not in sys.argv

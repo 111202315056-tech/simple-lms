@@ -20,3 +20,4 @@ gunicorn
 django-celery-beat
 
 flower
+reportlab==4.2.5

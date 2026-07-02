@@ -6,7 +6,7 @@ from django.contrib.auth.hashers import make_password, check_password
 from django.db.models import Q
 from django_ratelimit.decorators import ratelimit
 from django_ratelimit.exceptions import Ratelimited
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from django.conf import settings
 from typing import List, Optional
 from .models import Course, CourseMember, CourseContent, Comment
@@ -381,3 +381,23 @@ def trigger_export(request, course_id: int = None):
 def popular_courses(request):
     from .mongo import get_popular_courses
     return get_popular_courses(limit=10)
+
+
+@apiv1.get("enrollments/{id}/certificate", auth=jwt_auth, tags=["Enrollments"])
+def get_certificate(request, id: int):
+    member = get_object_or_404(CourseMember, pk=id)
+
+    if member.user_id != request.auth:
+        raise HttpError(403, "Anda hanya bisa mengambil sertifikat milik sendiri")
+
+    if member.roles != "std":
+        raise HttpError(400, "Sertifikat hanya tersedia untuk peserta (student)")
+
+    from .certificate import generate_certificate_pdf
+    student_name = member.user_id.get_full_name() or member.user_id.username
+    course_name = member.course_id.name
+    pdf_bytes = generate_certificate_pdf(student_name, course_name)
+
+    response = HttpResponse(pdf_bytes, content_type="application/pdf")
+    response["Content-Disposition"] = f'attachment; filename="sertifikat_{course_name}.pdf"'
+    return response

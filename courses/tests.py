@@ -337,3 +337,65 @@ class ContentTestCase(TestCase):
             **self.auth_header(self.student_token)
         )
         self.assertEqual(res.status_code, 403)
+
+
+class CertificateTestCase(TestCase):
+    def setUp(self):
+        self.client = Client()
+        self.admin = User.objects.create_superuser(
+            username="admin", email="admin@test.com", password="admin123"
+        )
+        self.student = User.objects.create_user(
+            username="student", email="student@test.com", password="pass123"
+        )
+        self.other_student = User.objects.create_user(
+            username="other_student", email="other@test.com", password="pass123"
+        )
+        self.student_token = create_access_token(self.student.id)
+        self.other_student_token = create_access_token(self.other_student.id)
+        self.course = Course.objects.create(
+            name="Test Course", description="Desc", price=0, teacher=self.admin
+        )
+        self.membership = CourseMember.objects.create(
+            course_id=self.course, user_id=self.student, roles="std"
+        )
+        self.assistant_membership = CourseMember.objects.create(
+            course_id=self.course, user_id=self.other_student, roles="ast"
+        )
+
+    def auth_header(self, token):
+        return {"HTTP_AUTHORIZATION": f"Bearer {token}"}
+
+    def test_get_certificate_success(self):
+        res = self.client.get(
+            f"/api/v1/enrollments/{self.membership.id}/certificate",
+            **self.auth_header(self.student_token)
+        )
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(res["Content-Type"], "application/pdf")
+        self.assertTrue(res.content.startswith(b"%PDF"))
+
+    def test_get_certificate_unauthorized(self):
+        res = self.client.get(f"/api/v1/enrollments/{self.membership.id}/certificate")
+        self.assertEqual(res.status_code, 401)
+
+    def test_get_certificate_not_owner(self):
+        res = self.client.get(
+            f"/api/v1/enrollments/{self.membership.id}/certificate",
+            **self.auth_header(self.other_student_token)
+        )
+        self.assertEqual(res.status_code, 403)
+
+    def test_get_certificate_wrong_role(self):
+        res = self.client.get(
+            f"/api/v1/enrollments/{self.assistant_membership.id}/certificate",
+            **self.auth_header(self.other_student_token)
+        )
+        self.assertEqual(res.status_code, 400)
+
+    def test_get_certificate_not_found(self):
+        res = self.client.get(
+            "/api/v1/enrollments/99999/certificate",
+            **self.auth_header(self.student_token)
+        )
+        self.assertEqual(res.status_code, 404)
