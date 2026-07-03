@@ -6,7 +6,7 @@
 |---|---|
 | Nama | Aldi Febriayanto |
 | NIM | A11.2023.15056 |
-| Kelas | A11.4602 (Pemrograman Sisi Server) |
+| Kelas | *(isi manual)* |
 | URL Repository | https://github.com/111202315056-tech/simple-lms |
 
 ---
@@ -134,17 +134,23 @@ Menjalankan test suite lengkap dengan coverage report:
 docker-compose exec web bash -c "coverage run --source=courses --omit=courses/lab_views.py,courses/tasks.py,courses/views.py manage.py test courses --settings=config.settings_test && coverage report"
 ```
 
-**Hasil:** 66 test (64 pass, 2 skip), 0 failure, **coverage 89%** — melampaui target 75% untuk nilai maksimal pada kriteria testing rubrik.
+**Hasil:** 76 test (74 pass, 2 skip), 0 failure, **coverage 90%** — melampaui target 75% untuk nilai maksimal pada kriteria testing rubrik.
+
+Termasuk 10 test baru di `courses/testcases/test_cache_and_performance.py` (coverage 100%) yang secara otomatis memvalidasi:
+- Fungsi cache Redis (`set`/`get`/`invalidate` untuk course list & detail, key spesifik per kombinasi filter)
+- Cache benar-benar terisi setelah request API dan terhapus otomatis saat course baru dibuat (end-to-end)
+- Endpoint `optimized` menggunakan query jauh lebih sedikit (≤5) dibanding `baseline` (>10) dengan 10 course uji, dibaca langsung dari `query_count` pada response — bukan hanya pembuktian manual
 
 | Modul | Coverage |
 |---|---|
 | `courses/cache.py` | 100% |
 | `courses/certificate.py` | 100% |
 | `courses/schemas.py` | 100% |
+| `courses/testcases/test_cache_and_performance.py` | 100% |
 | `courses/apiv1.py` | 80% |
 | `courses/auth.py` | 74% |
 | `courses/mongo.py` | 48% *(sebagian besar branch koneksi MongoDB tidak dilatih karena test menggunakan mock/skip untuk skenario tertentu)* |
-| **Total** | **89%** |
+| **Total** | **90%** |
 
 Test mencakup: autentikasi (register/login/refresh), CRUD course, permission/RBAC (student ditolak membuat course dengan status 403), enrollment, comment, dan model/business logic.
 
@@ -156,7 +162,7 @@ Postman collection tersedia di `Simple_LMS_API.postman_collection.json` untuk pe
 - Isi dan TTL cache Redis sebelum/sesudah invalidation
 - Log Celery worker menunjukkan task `send_enrollment_email` berstatus `SUCCESS`
 - Dashboard Flower menampilkan riwayat task
-- Hasil test suite: 66 test, 89% coverage
+- Hasil test suite: 76 test, 90% coverage (termasuk test otomatis untuk cache Redis dan N+1 query)
 - Riwayat GitHub Actions CI — seluruh run hijau/sukses
 
 *(Lampirkan file screenshot pada folder `docs/screenshots/` di repository)*
