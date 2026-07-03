@@ -1,0 +1,316 @@
+================================================================
+  0. START ALL SERVICES
+=================================================================
+time="2026-07-03T13:14:42+07:00" level=warning msg="Found orphan containers ([simple-lms-web-run-28ddd4ae3d1a simple-lms-web-run-bcebad4427aa simple-lms-web-run-9f1879be8305 simple-lms-web-run-3cc3ca50df7c simple-lms-web-run-3db28dcc30d3 simple-lms-web-run-f0b2e5e66e34 simple-lms-web-run-e409c95bb696 simple-lms-web-run-2801ea8b2317]) for this project. If you removed or renamed this service in your compose file, you can run this command with the --remove-orphans flag to clean it up."
+[+] up 8/8
+ ✔ Container redis_cache   Running                                0.0s
+ ✔ Container rabbitmq      Running                                0.0s
+ ✔ Container mongodb       Running                                0.0s
+ ✔ Container postgres_db   Healthy                                0.5s
+ ✔ Container django_app    Running                                0.0s
+ ✔ Container celery_worker Running                                0.0s
+ ✔ Container celery_beat   Running                                0.0s
+ ✔ Container flower        Running                                0.0s
+Menunggu service siap...
+NAME            IMAGE                          COMMAND                  SERVICE         CREATED        STATUS                    PORTS
+celery_beat     simple-lms-celery-beat         "celery -A config be…"   celery-beat     5 weeks ago    Up 27 minutes             
+celery_worker   simple-lms-celery-worker       "celery -A config wo…"   celery-worker   5 weeks ago    Up 27 minutes             
+django_app      simple-lms-web                 "python manage.py ru…"   web             30 hours ago   Up 27 minutes             0.0.0.0:8000->8000/tcp, [::]:8000->8000/tcp
+flower          simple-lms-flower              "celery -A config fl…"   flower          5 weeks ago    Up 27 minutes             0.0.0.0:5555->5555/tcp, [::]:5555->5555/tcp
+mongodb         mongo:7                        "docker-entrypoint.s…"   mongodb         5 weeks ago    Up 27 minutes             0.0.0.0:27017->27017/tcp, [::]:27017->27017/tcp
+postgres_db     postgres:15                    "docker-entrypoint.s…"   db              5 weeks ago    Up 27 minutes (healthy)   0.0.0.0:5432->5432/tcp, [::]:5432->5432/tcp
+rabbitmq        rabbitmq:3-management-alpine   "docker-entrypoint.s…"   rabbitmq        5 weeks ago    Up 27 minutes             0.0.0.0:5672->5672/tcp, [::]:5672->5672/tcp, 0.0.0.0:15672->15672/tcp, [::]:15672->15672/tcp
+redis_cache     redis:7-alpine                 "docker-entrypoint.s…"   redis           5 weeks ago    Up 27 minutes             0.0.0.0:6379->6379/tcp, [::]:6379->6379/tcp
+
+Tekan ENTER untuk lanjut ke langkah berikutnya...
+
+
+=================================================================
+  1. BUKA DOKUMENTASI & MONITORING (Swagger, Silk, Flower)
+=================================================================
+3 tab browser dibuka: Swagger UI, Silk Profiler, Flower.
+
+Tekan ENTER untuk lanjut ke langkah berikutnya...
+
+
+=================================================================
+  2. AUTH: REGISTER USER BARU
+=================================================================
+
+
+id         : 132
+username   : demo_student_7133
+email      : demo6482@mail.com
+first_name : Demo
+last_name  : Student
+role       : student
+
+
+
+
+Tekan ENTER untuk lanjut ke langkah berikutnya...
+
+
+=================================================================
+  3. AUTH: LOGIN & DAPATKAN JWT TOKEN
+=================================================================
+Token diperoleh: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ...
+
+Tekan ENTER untuk lanjut ke langkah berikutnya...
+
+
+=================================================================
+  4. RBAC: STUDENT COBA BUAT COURSE (HARUS DITOLAK)
+=================================================================
+Status Code: 403
+Response   : {"detail": "Hanya Instructor atau Admin yang diizinkan"}
+
+Tekan ENTER untuk lanjut ke langkah berikutnya...
+
+
+=================================================================
+  5. FILTERING, SORTING, PAGINATION
+=================================================================
+{
+    "total":  2,
+    "page":  1,
+    "per_page":  5,
+    "results":  [
+                    {
+                        "id":  5,
+                        "name":  "Machine Learning",
+                        "description":  "Belajar ML dengan Python",
+                        "price":  60000,
+                        "image":  null,
+                        "teacher":  {
+                                        "id":  3,
+                                        "username":  "dosen02",
+                                        "first_name":  "Siti",
+                                        "last_name":  "Rahayu"
+                                    },
+                        "created_at":  "2026-04-08T11:50:56.615Z",
+                        "updated_at":  "2026-04-08T11:50:56.615Z"
+                    },
+                    {
+                        "id":  111,
+                        "name":  "Belajar Python",
+                        "description":  "Kursus Python dasar",
+                        "price":  50000,
+                        "image":  null,
+                        "teacher":  {
+                                        "id":  1,
+                                        "username":  "admin",
+                                        "first_name":  "",
+                                        "last_name":  ""
+                                    },
+                        "created_at":  "2026-05-20T00:45:47.760Z",
+                        "updated_at":  "2026-05-20T00:45:47.760Z"
+                    }
+                ]
+}
+
+Tekan ENTER untuk lanjut ke langkah berikutnya...
+
+
+=================================================================
+  6. REDIS CACHE: CEK KEY SEBELUM
+=================================================================
+Keys di Redis sebelum create course:
+:1:course_list:1:5:Python:-price
+
+Tekan ENTER untuk lanjut ke langkah berikutnya...
+
+
+=================================================================
+  6b. REDIS CACHE INVALIDATION: LOGIN INSTRUCTOR & BUAT COURSE
+=================================================================
+
+
+id          : 114
+name        : Demo Course 473
+description : Dibuat saat demo
+price       : 25000
+image       : 
+teacher     : @{id=2; username=dosen01; first_name=Budi; 
+              last_name=Santoso}
+created_at  : 2026-07-03T06:16:44.861Z
+updated_at  : 2026-07-03T06:16:44.861Z
+
+
+
+Keys di Redis SETELAH create course (harusnya kosong / berkurang):
+
+
+Tekan ENTER untuk lanjut ke langkah berikutnya...
+
+
+=================================================================
+  7. N+1 QUERY FIXING: BASELINE vs OPTIMIZED
+=================================================================
+BASELINE  -> Queries: 458 | Time: 460.17 ms
+OPTIMIZED -> Queries: 2 | Time: 5.87 ms
+
+Lihat juga tab Silk Profiler di browser untuk detail query.
+
+Tekan ENTER untuk lanjut ke langkah berikutnya...
+
+
+=================================================================
+  8. RESPONSE & ERROR FORMAT KONSISTEN
+=================================================================
+Test 404:
+Status: 404 | Body: {"detail": "Course tidak ditemukan"}
+
+Test 401 (tanpa token):
+Status: 401 | Body: {"detail": "Unauthorized"}
+
+Tekan ENTER untuk lanjut ke langkah berikutnya...
+
+
+=================================================================
+  9. MONGODB: ENROLL, VIEW LOG, POPULAR COURSES AGGREGATION
+=================================================================
+
+
+message       : Berhasil mendaftar ke Demo Course 473
+enrollment_id : 518
+
+
+
+
+Popular Courses (dari MongoDB aggregation):
+{
+    "value":  [
+                  {
+                      "_id":  40,
+                      "course_name":  "Test Course",
+                      "view_count":  5
+                  },
+                  {
+                      "_id":  37,
+                      "course_name":  "Test Course",
+                      "view_count":  5
+                  },
+                  {
+                      "_id":  35,
+                      "course_name":  "Test Course",
+                      "view_count":  3
+                  },
+                  {
+                      "_id":  36,
+                      "course_name":  "Test Course",
+                      "view_count":  2
+                  },
+                  {
+                      "_id":  114,
+                      "course_name":  "Demo Course 473",
+                      "view_count":  1
+                  },
+                  {
+                      "_id":  5,
+                      "course_name":  "Machine Learning",
+                      "view_count":  1
+                  }
+              ],
+    "Count":  6
+}
+
+Tekan ENTER untuk lanjut ke langkah berikutnya...
+
+
+=================================================================
+  10. CELERY ASYNC: CEK LOG WORKER UNTUK EMAIL NOTIFICATION
+=================================================================
+Lihat log celery-worker (task send_enrollment_email harus muncul SUCCESS):
+celery_worker  | [2026-07-03 13:02:35,121: WARNING/ForkPoolWorker-16] [EMAIL] Dear Teacher 14,
+celery_worker  | [2026-07-03 13:02:35,121: WARNING/ForkPoolWorker-16] [EMAIL] Kamu telah berhasil mendaftar ke course: Kursus 011
+celery_worker  | [2026-07-03 13:02:35,158: INFO/ForkPoolWorker-16] Task courses.tasks.send_enrollment_email[4a8fa5cd-47f0-4109-b4b9-b2f2b6af71c6] succeeded in 0.06901112699995338s: {'status': 'success', 'user': 'teacher14', 'course': 'Kursus 011'}
+celery_worker  | [2026-07-03 13:02:47,800: INFO/MainProcess] Task courses.tasks.send_enrollment_email[c9fee620-0fd5-4904-9de2-b8d3bc9611f1] received
+celery_worker  | [2026-07-03 13:02:47,809: WARNING/ForkPoolWorker-16] [EMAIL] Sending enrollment email to student086@lms.id
+celery_worker  | [2026-07-03 13:02:47,809: WARNING/ForkPoolWorker-16] [EMAIL] Subject: Selamat! Kamu berhasil mendaftar ke Kursus 046
+celery_worker  | [2026-07-03 13:02:47,809: WARNING/ForkPoolWorker-16] [EMAIL] Dear Student 086,
+celery_worker  | [2026-07-03 13:02:47,809: WARNING/ForkPoolWorker-16] [EMAIL] Kamu telah berhasil mendaftar ke course: Kursus 046
+celery_worker  | [2026-07-03 13:02:47,811: INFO/ForkPoolWorker-16] Task courses.tasks.send_enrollment_email[c9fee620-0fd5-4904-9de2-b8d3bc9611f1] succeeded in 0.009686479000038162s: {'status': 'success', 'user': 'student086', 'course': 'Kursus 046'}
+celery_worker  | [2026-07-03 13:16:55,081: INFO/MainProcess] Task courses.tasks.send_enrollment_email[fcd786ec-0d61-4e10-abf9-de6c02c2fee7] received
+celery_worker  | [2026-07-03 13:16:55,091: WARNING/ForkPoolWorker-16] [EMAIL] Sending enrollment email to demo6482@mail.com
+celery_worker  | [2026-07-03 13:16:55,091: WARNING/ForkPoolWorker-16] [EMAIL] Subject: Selamat! Kamu berhasil mendaftar ke Demo Course 473
+celery_worker  | [2026-07-03 13:16:55,091: WARNING/ForkPoolWorker-16] [EMAIL] Dear Demo Student,
+celery_worker  | [2026-07-03 13:16:55,091: WARNING/ForkPoolWorker-16] [EMAIL] Kamu telah berhasil mendaftar ke course: Demo Course 473
+celery_worker  | [2026-07-03 13:16:55,094: INFO/ForkPoolWorker-16] Task courses.tasks.send_enrollment_email[fcd786ec-0d61-4e10-abf9-de6c02c2fee7] succeeded in 0.01184760399996776s: {'status': 'success', 'user': 'demo_student_7133', 'course': 'Demo Course 473'}
+
+Cek juga dashboard Flower yang sudah terbuka di browser (tab ke-3).
+
+Tekan ENTER untuk lanjut ke langkah berikutnya...
+
+
+=================================================================
+  11. TESTING: JALANKAN FULL TEST SUITE + COVERAGE
+=================================================================
+Found 66 test(s).
+Creating test database for alias 'default'...
+System check identified no issues (0 silenced).
+.........s.s......................................................
+----------------------------------------------------------------------
+Ran 66 tests in 16.443s
+
+OK (skipped=2)
+Destroying test database for alias 'default'...
+Name                                 Stmts   Miss  Cover   Missing
+------------------------------------------------------------------
+courses/__init__.py                      0      0   100%
+courses/admin.py                        28      0   100%
+courses/apiv1.py                       261     53    80%   57, 65, 83-84, 99, 102-103, 121-123, 129, 151, 157, 159, 162, 179, 199, 216, 218-220, 238-248, 291, 305-313, 324, 347-348, 350, 363-364, 369, 376-377, 382-383
+courses/apps.py                          3      0   100%
+courses/auth.py                         61     16    74%   46-49, 60, 65-66, 81-84, 88-92
+courses/cache.py                        22      0   100%
+courses/certificate.py                  31      0   100%
+courses/helpers.py                       6      0   100%
+courses/migrations/0001_initial.py       7      0   100%
+courses/migrations/__init__.py           0      0   100%
+courses/models.py                       63      3    95%   87, 111, 138
+courses/mongo.py                        58     30    48%   16-18, 26, 36-37, 47-49, 63-77, 82-99
+courses/schemas.py                     123      0   100%
+courses/testcases/__init__.py            0      0   100%
+courses/testcases/test_api.py          103     13    87%   198-208, 212-223
+courses/testcases/test_models.py        38      0   100%
+courses/testcases/test_utils.py         43      0   100%
+courses/tests.py                       195      0   100%
+courses/urls.py                          4      0   100%
+------------------------------------------------------------------
+TOTAL                                 1046    115    89%
+
+Tekan ENTER untuk lanjut ke langkah berikutnya...
+
+
+=================================================================
+  12. CI/CD: BUKA GITHUB ACTIONS
+=================================================================
+Tunjukkan riwayat run CI yang hijau/sukses.
+
+Tekan ENTER untuk lanjut ke langkah berikutnya...
+
+
+=================================================================
+  13. DOKUMENTASI: BUKA README DI GITHUB
+=================================================================
+Tunjukkan diagram arsitektur, cara menjalankan, akun demo.
+
+Tekan ENTER untuk lanjut ke langkah berikutnya...
+
+
+=================================================================
+  DEMO SELESAI
+=================================================================
+Semua fitur utama sudah didemokan:
+  1. Docker Compose (semua service)
+  2. Auth (register, login, JWT)
+  3. RBAC (403 untuk role tidak sesuai)
+  4. Filtering, sorting, pagination
+  5. Redis caching + cache invalidation
+  6. N+1 query fixing (Django Silk)
+  7. Response & error format konsisten
+  8. MongoDB activity log & aggregation
+  9. Celery async task + Flower monitoring
+ 10. Testing + coverage report
+ 11. CI/CD (GitHub Actions)
+ 12. Dokumentasi (README + diagram)
