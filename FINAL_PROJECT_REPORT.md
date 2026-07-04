@@ -158,14 +158,21 @@ Postman collection tersedia di `Simple_LMS_API.postman_collection.json` untuk pe
 
 ## 10. Screenshot / Bukti Pengujian
 
-- Perbandingan query count baseline vs optimized (Django Silk)
-- Isi dan TTL cache Redis sebelum/sesudah invalidation
-- Log Celery worker menunjukkan task `send_enrollment_email` berstatus `SUCCESS`
-- Dashboard Flower menampilkan riwayat task
-- Hasil test suite: 76 test, 90% coverage (termasuk test otomatis untuk cache Redis dan N+1 query)
-- Riwayat GitHub Actions CI — seluruh run hijau/sukses
+### Swagger UI — Daftar Endpoint Lengkap
+![Swagger UI](docs/screenshots/01-swagger-ui.png)
 
-*(Lampirkan file screenshot pada folder `docs/screenshots/` di repository)*
+### Flower — Celery Worker Status (Online, 0 Failed)
+![Flower Workers](docs/screenshots/02-flower-workers.png)
+
+### Flower — Riwayat Task Async Email Enrollment (Semua SUCCESS)
+![Flower Tasks](docs/screenshots/03-flower-tasks.png)
+
+### Django Silk — Perbandingan Query Baseline vs Optimized (N+1 Fixing)
+`/lab/course-list/baseline/` menghasilkan 473ms/229 queries, sedangkan `/lab/course-list/optimized/` hanya 14ms/1 query pada kombinasi request yang sama.
+
+![Silk N+1 Comparison](docs/screenshots/04-silk-nplus1-comparison.png)
+
+Bukti tambahan (hasil test suite lengkap dan riwayat CI) tersedia di [`docs/demo-output.txt`](docs/demo-output.txt) dan tab [GitHub Actions](https://github.com/111202315056-tech/simple-lms/actions) repository.
 
 ---
 
