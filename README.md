@@ -278,3 +278,23 @@ docker-compose exec web python seed.py
 | Admin | admin | admin123 |
 | Instructor | dosen01 | pass123 |
 | Student | siswa01 | testpass123 |
+
+## Screenshot & Bukti Pengujian
+
+Seluruh bukti visual pengujian tersimpan di folder [docs/screenshots/](docs/screenshots/). Berikut ringkasannya:
+
+### 1. Swagger UI — Daftar Endpoint Lengkap
+![Swagger UI](docs/screenshots/01-swagger-ui.png)
+
+### 2. Flower — Celery Worker Status
+![Flower Workers](docs/screenshots/02-flower-workers.png)
+
+### 3. Flower — Riwayat Task Async (Email Enrollment)
+![Flower Tasks](docs/screenshots/03-flower-tasks.png)
+
+### 4. Django Silk — Perbandingan Query Baseline vs Optimized (N+1 Fixing)
+![Silk N+1 Comparison](docs/screenshots/04-silk-nplus1-comparison.png)
+
+Log lengkap hasil demo (semua fitur dijalankan berurutan) tersedia di [docs/demo-output.txt](docs/demo-output.txt).
+
+Laporan lengkap dengan penjelasan tiap fitur ada di [FINAL_PROJECT_REPORT.md](FINAL_PROJECT_REPORT.md).
