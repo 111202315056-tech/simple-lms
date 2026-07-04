@@ -6,7 +6,7 @@
 |---|---|
 | Nama | Aldi Febriayanto |
 | NIM | A11.2023.15056 |
-| Kelas | *(isi manual)* |
+| Kelas | A11.4602 (Pemrograman Sisi Server) |
 | URL Repository | https://github.com/111202315056-tech/simple-lms |
 
 ---
