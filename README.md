@@ -241,8 +241,8 @@ docker-compose exec web python manage.py test courses --settings=config.settings
 docker-compose exec web bash -c "coverage run --source=courses --omit=courses/lab_views.py,courses/tasks.py,courses/views.py manage.py test courses --settings=config.settings_test && coverage report"
 ```
 
-**Hasil test:** 61 tests, 59 passed, 2 skipped, 0 failed  
-**Coverage:** 87%
+**Hasil test:** 76 tests, 74 passed, 2 skipped, 0 failed  
+**Coverage:** 90%
 
 ## Cara Menjalankan Project
 
@@ -277,4 +277,4 @@ docker-compose exec web python seed.py
 |---|---|---|
 | Admin | admin | admin123 |
 | Instructor | dosen01 | pass123 |
-| Student | siswa01 | pass123 |
+| Student | siswa01 | testpass123 |
